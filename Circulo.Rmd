@@ -1,0 +1,60 @@
+---
+title: "System"
+author: "Daniel"
+date: "2023-10-11"
+output: html_document
+---
+
+```{r}
+circle = function(ponto, params){
+  x = params[1]
+  y = params[2]
+  r = params[3]
+  
+  distance = (ponto[1] - x)^2 + (ponto[2] - y)^2 - r^2
+  return(distance)
+}
+
+distance = function(params, pontos){
+  p1 = pontos[[1]]
+  p2 = pontos[[2]]
+  p3 = pontos[[3]]
+  
+  eq = abs(circle(p1, params) + circle(p2, params) + circle(p3, params))
+  return(eq)
+}
+
+get_coords = function(pontos){
+  objeto = optim(par = c(2.5,3,3), fn = distance, pontos = pontos)
+  lista = list(x = objeto$par[1], y = objeto$par[2], r = objeto$par[3])
+  return(lista)
+}
+
+plot_circle = function(pontos, circulo){
+  library(ggplot2)  
+  x = c(pontos[[1]][1], pontos[[2]][1], pontos[[3]][1])
+  y = c(pontos[[1]][2], pontos[[2]][2], pontos[[3]][2])
+  
+  numero = max(abs(c(x,y))) + 1
+  
+  data1 = data.frame(x,y)
+  data2 = data.frame(x = circulo$x, y = circulo$y, r = circulo$r)
+  print(data2)
+  ggplot()+
+    geom_point(data = data1, aes(x = x, y = y), color = "red")+
+    ggforce::geom_circle(data = data2, aes(x0 = x, y0 = y, r = r))+
+    theme_classic()+
+    xlim(-numero, numero)+
+    ylim(-numero, numero)
+    
+}
+```
+
+```{r}
+pontos = list(c(1,2), c(4,5), c(3, -1))
+
+circulo = get_coords(pontos)
+
+plot_circle(pontos, circulo)
+```
+
